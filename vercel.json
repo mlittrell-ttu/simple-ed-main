@@ -1,0 +1,38 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "apps/flash-card/package.json",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "apps/random-selection/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/flash-card/(.*)",
+      "dest": "/apps/flash-card/$1"
+    },
+    {
+      "src": "/flash-card",
+      "dest": "/apps/flash-card"
+    },
+    {
+      "src": "/random-selection/(.*)",
+      "dest": "/apps/random-selection/$1"
+    },
+    {
+      "src": "/random-selection",
+      "dest": "/apps/random-selection/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}

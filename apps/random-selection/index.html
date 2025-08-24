@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Name Selector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-method {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .input-method:hover {
+            border-color: #667eea;
+        }
+
+        .input-method.active {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .method-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .method-title input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .file-input input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .selection-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .number-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .number-input label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .number-input input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .results h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .selected-names {
+            list-style: none;
+        }
+
+        .selected-names li {
+            background: white;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #2d5a2d;
+        }
+
+        .disabled {
+            background-color: #f5f5f5 !important;
+            color: #999;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .selection-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Random Name Selector</h1>
+        
+        <div class="input-section">
+            <div class="input-method active" id="text-method">
+                <div class="method-title">
+                    <input type="radio" name="input-method" value="text" checked>
+                    <span>Paste Names (comma-separated)</span>
+                </div>
+                <textarea 
+                    id="names-input" 
+                    placeholder="Enter names separated by commas. Example: John Smith, Jane Doe, Mike Johnson"
+                ></textarea>
+            </div>
+
+            <div class="input-method" id="csv-method">
+                <div class="method-title">
+                    <input type="radio" name="input-method" value="csv">
+                    <span>Upload CSV File</span>
+                </div>
+                <div class="file-input-wrapper">
+                    <div class="file-input">
+                        <input type="file" id="csv-file" accept=".csv">
+                        <span>Upload CSV file (first name, last name) or drag and drop</span>
+                    </div>
+                </div>
+                <div id="file-info" class="file-info" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="selection-controls">
+            <div class="number-input">
+                <label for="count-input">Number to select:</label>
+                <input type="number" id="count-input" min="1" value="1">
+            </div>
+            <button class="btn" id="select-btn">Select Random Names</button>
+        </div>
+
+        <div id="error-message" style="display: none;"></div>
+        <div id="results" style="display: none;"></div>
+    </div>
+
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    
+    <script>
+        let currentNames = [];
+        let currentMethod = 'text';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            selectMethod('text');
+        });
+
+        function setupEventListeners() {
+            // Radio button listeners
+            document.querySelectorAll('input[name="input-method"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    selectMethod(this.value);
+                });
+            });
+
+            // Method title click listeners
+            document.querySelectorAll('.method-title').forEach(title => {
+                title.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    selectMethod(radio.value);
+                });
+            });
+
+            // File upload listener
+            document.getElementById('csv-file').addEventListener('change', handleFileUpload);
+
+            // Select button listener
+            document.getElementById('select-btn').addEventListener('click', selectRandomNames);
+
+            // Input listeners for clearing results
+            document.getElementById('names-input').addEventListener('input', clearResults);
+            document.getElementById('count-input').addEventListener('input', clearResults);
+
+            // Keyboard shortcuts
+            document.getElementById('count-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    selectRandomNames();
+                }
+            });
+
+            document.getElementById('names-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    selectRandomNames();
+                }
+            });
+        }
+
+        function selectMethod(method) {
+            currentMethod = method;
+            
+            // Update active states
+            document.querySelectorAll('.input-method').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(method + '-method').classList.add('active');
+
+            // Update radio button
+            document.querySelector(`input[value="${method}"]`).checked = true;
+            
+            // Enable/disable inputs
+            const textArea = document.getElementById('names-input');
+            const fileWrapper = document.querySelector('.file-input-wrapper');
+            
+            if (method === 'text') {
+                textArea.disabled = false;
+                textArea.classList.remove('disabled');
+                fileWrapper.classList.add('disabled');
+            } else {
+                textArea.disabled = true;
+                textArea.classList.add('disabled');
+                fileWrapper.classList.remove('disabled');
+            }
+            
+            clearResults();
+            clearError();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showError('Please upload a CSV file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const names = parseCSV(csv);
+                    currentNames = names;
+                    
+                    document.getElementById('file-info').style.display = 'block';
+                    document.getElementById('file-info').innerHTML = 
+                        `File loaded: <strong>${file.name}</strong><br>Found ${names.length} names`;
+                    
+                    clearError();
+                } catch (error) {
+                    showError('Error reading CSV file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim());
+            const names = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const columns = line.split(',').map(col => col.trim().replace(/"/g, ''));
+                
+                if (columns.length >= 2) {
+                    const firstName = columns[0];
+                    const lastName = columns[1];
+                    if (firstName && lastName) {
+                        names.push(`${firstName} ${lastName}`);
+                    }
+                } else if (columns.length === 1 && columns[0]) {
+                    names.push(columns[0]);
+                }
+            }
+            
+            if (names.length === 0) {
+                throw new Error('No valid names found in CSV. Please ensure your CSV has first name and last name columns.');
+            }
+            
+            return names;
+        }
+
+        function parseTextInput() {
+            const text = document.getElementById('names-input').value.trim();
+            if (!text) return [];
+            
+            return text.split(',')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+        }
+
+        function selectRandomNames() {
+            clearError();
+            
+            let names = [];
+            
+            if (currentMethod === 'text') {
+                names = parseTextInput();
+                if (names.length === 0) {
+                    showError('Please enter some names separated by commas.');
+                    return;
+                }
+            } else if (currentMethod === 'csv') {
+                names = currentNames;
+                if (names.length === 0) {
+                    showError('Please upload a CSV file with names.');
+                    return;
+                }
+            }
+            
+            const count = parseInt(document.getElementById('count-input').value);
+            if (!count || count < 1) {
+                showError('Please enter a valid number to select.');
+                return;
+            }
+            
+            if (count > names.length) {
+                showError(`Cannot select ${count} names. Only ${names.length} names available.`);
+                return;
+            }
+            
+            const shuffled = [...names].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, count);
+            
+            displayResults(selected, names.length);
+        }
+
+        function displayResults(selectedNames, totalNames) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            resultsDiv.innerHTML = `
+                <h3>Selected Names (${selectedNames.length} of ${totalNames}):</h3>
+                <ul class="selected-names">
+                    ${selectedNames.map(name => `<li>${name}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.style.display = 'block';
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+        }
+
+        function clearError() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function clearResults() {
+            document.getElementById('results').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
