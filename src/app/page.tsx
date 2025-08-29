@@ -25,6 +25,14 @@ export default function Home() {
               Launch Random Selection →
             </Link>
           </div>
+          
+          <div className="app-card">
+            <h2>Psychometric Analysis</h2>
+            <p>Analyze exam reliability with Cronbach's Alpha and item statistics</p>
+            <Link href="/psychometric-analysis" className="app-link">
+              Launch Psychometric Analysis →
+            </Link>
+          </div>
         </div>
       </main>
       
